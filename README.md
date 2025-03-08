@@ -1,1 +1,1 @@
-Testing files for Logia tests.
+Automated testing files for Logia tests.
