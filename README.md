@@ -1,1 +1,1 @@
-# logia-tests
+Testing files for Logia tests.
