@@ -78,13 +78,6 @@ pip3 install pyqt5 deep-translator
 
 * Install Python via Homebrew: `brew install python`
 * Then run: `pip3 install pyqt5 deep-translator`
-
 ---
 
-### 📝 Next Steps
 
-If you send me your actual script (or if you’re okay with using the example above), I can:
-
-* Add step-by-step comments,
-* Improve the interface (language selectors, history, menus),
-* Provide install scripts for each OS.
