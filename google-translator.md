@@ -1,83 +1,193 @@
-### ✅ tool API google translator
+## ✅ PyQt5 GUI Version (for macOS, Windows, and Ubuntu)
 
+Below is the **converted script** using PyQt5, with **step-by-step comments**, preserving all the functionality from the original Tkinter version.
 
 ---
-- [ ] 
-### 👨‍💻 Meanwhile, here’s a *generic example*:
+### 🧠 Commented Script: `qt_translator.py`
 
-#### 1. Required tools
-
-* **Python** (>=3.7)
-* **PyQt5** or **PySide6** (for the GUI)
-* **Translation library** (e.g., `deep-translator`, `googletrans`)
-
-#### 2. Basic script structure
-- windows 10 script
 ```python
-from PyQt5 import QtWidgets
-from deep_translator import GoogleTranslator
+import os
+from PyQt5.QtWidgets import (
+    QApplication, QWidget, QLabel, QLineEdit, QPushButton, QProgressBar,
+    QFileDialog, QVBoxLayout, QHBoxLayout, QComboBox, QMessageBox
+)
+from googletrans import Translator
 
-class TranslatorApp(QtWidgets.QWidget):
+# Dictionary of available languages and their codes
+LANGUAGES = {
+    "English": "en", "Portuguese": "pt", "Spanish": "es", "French": "fr",
+    "German": "de", "Italian": "it", "Dutch": "nl", "Chinese": "zh-CN", "Japanese": "ja"
+    # Add more as needed
+}
+
+class TranslatorApp(QWidget):
     def __init__(self):
         super().__init__()
         self.init_ui()
 
     def init_ui(self):
-        self.input = QtWidgets.QTextEdit()
-        self.output = QtWidgets.QTextEdit()
-        btn = QtWidgets.QPushButton("Translate")
-        btn.clicked.connect(self.translate_text)
+        # Window title and fixed size
+        self.setWindowTitle("Text Translator (Qt)")
+        self.setFixedSize(500, 400)
 
-        layout = QtWidgets.QVBoxLayout()
-        layout.addWidget(self.input)
-        layout.addWidget(btn)
-        layout.addWidget(self.output)
+        # Input and output folder fields
+        self.input_path = QLineEdit(self)
+        self.input_path.setReadOnly(True)
+        input_button = QPushButton("Input Folder")
+        input_button.clicked.connect(self.choose_input_folder)
+
+        self.output_path = QLineEdit(self)
+        self.output_path.setReadOnly(True)
+        output_button = QPushButton("Output Folder")
+        output_button.clicked.connect(self.choose_output_folder)
+
+        # Language dropdowns
+        self.source_lang = QComboBox(self)
+        self.source_lang.addItems(LANGUAGES.keys())
+        self.source_lang.setCurrentText("English")
+
+        self.target_lang = QComboBox(self)
+        self.target_lang.addItems(LANGUAGES.keys())
+        self.target_lang.setCurrentText("Portuguese")
+
+        # Progress bar
+        self.progress = QProgressBar(self)
+
+        # Buttons
+        translate_button = QPushButton("Translate")
+        translate_button.clicked.connect(self.translate_files)
+
+        exit_button = QPushButton("Exit")
+        exit_button.clicked.connect(self.close)
+
+        # Layout setup
+        layout = QVBoxLayout()
+
+        layout.addWidget(QLabel("Select Input Folder:"))
+        h1 = QHBoxLayout()
+        h1.addWidget(self.input_path)
+        h1.addWidget(input_button)
+        layout.addLayout(h1)
+
+        layout.addWidget(QLabel("Select Output Folder:"))
+        h2 = QHBoxLayout()
+        h2.addWidget(self.output_path)
+        h2.addWidget(output_button)
+        layout.addLayout(h2)
+
+        layout.addWidget(QLabel("Source Language:"))
+        layout.addWidget(self.source_lang)
+
+        layout.addWidget(QLabel("Target Language:"))
+        layout.addWidget(self.target_lang)
+
+        layout.addWidget(self.progress)
+        layout.addWidget(translate_button)
+        layout.addWidget(exit_button)
+
         self.setLayout(layout)
-        self.setWindowTitle("Translator EN↔PT")
 
-    def translate_text(self):
-        src = self.input.toPlainText()
-        # Auto-detect source language
-        result = GoogleTranslator(source="auto", target="pt").translate(src)
-        self.output.setPlainText(result)
+    def choose_input_folder(self):
+        folder = QFileDialog.getExistingDirectory(self, "Select Input Folder")
+        if folder:
+            self.input_path.setText(folder)
+
+    def choose_output_folder(self):
+        folder = QFileDialog.getExistingDirectory(self, "Select Output Folder")
+        if folder:
+            self.output_path.setText(folder)
+
+    def translate_files(self):
+        input_folder = self.input_path.text()
+        output_folder = self.output_path.text()
+        src_lang = LANGUAGES[self.source_lang.currentText()]
+        tgt_lang = LANGUAGES[self.target_lang.currentText()]
+
+        if not input_folder or not output_folder:
+            QMessageBox.warning(self, "Error", "Please select both folders.")
+            return
+        if src_lang == tgt_lang:
+            QMessageBox.warning(self, "Error", "Source and target languages must be different.")
+            return
+
+        files = [f for f in os.listdir(input_folder) if f.endswith(".txt")]
+        if not files:
+            QMessageBox.information(self, "Info", "No .txt files found.")
+            return
+
+        translator = Translator()
+        total = len(files)
+
+        for i, filename in enumerate(files, 1):
+            try:
+                with open(os.path.join(input_folder, filename), "r", encoding="utf-8") as f:
+                    content = f.read()
+
+                translated = translator.translate(content, src=src_lang, dest=tgt_lang).text
+                new_name = f"{i:03d}_translated.txt"
+                with open(os.path.join(output_folder, new_name), "w", encoding="utf-8") as f:
+                    f.write(translated)
+            except Exception as e:
+                QMessageBox.warning(self, "Error", f"Error with {filename}: {e}")
+
+            self.progress.setValue(int(i / total * 100))
+            QApplication.processEvents()
+
+        QMessageBox.information(self, "Done", "All files translated successfully!")
 
 if __name__ == "__main__":
-    app = QtWidgets.QApplication([])
-    win = TranslatorApp()
-    win.show()
-    app.exec()
+    import sys
+    app = QApplication(sys.argv)
+    translator = TranslatorApp()
+    translator.show()
+    sys.exit(app.exec_())
 ```
-
-This template:
-
-* Creates a window with input field, a button, and output field.
-* Uses `deep-translator` to auto-detect the language and translate to Portuguese.
 
 ---
 
-### 🛠️ Installation Instructions (Windows 10, Ubuntu, macOS):
+## 💾 Installation Instructions (Windows 10, Ubuntu, macOS)
 
-```bash
-pip install pyqt5 deep-translator
-```
+### 1. Install Python (recommended version: 3.8 or higher)
 
-#### Windows
+#### ✅ On Windows
 
-* Install Python from the official installer.
-* Then run `pip install ...` as above.
+* Download from: [https://www.python.org](https://www.python.org)
+* During installation: check **“Add Python to PATH”**
 
-#### Ubuntu
+#### ✅ On Ubuntu
 
 ```bash
 sudo apt update
 sudo apt install python3 python3-pip
-pip3 install pyqt5 deep-translator
 ```
 
-#### macOS
+#### ✅ On macOS
 
-* Install Python via Homebrew: `brew install python`
-* Then run: `pip3 install pyqt5 deep-translator`
+```bash
+brew install python
+```
+
 ---
 
+### 2. Install dependencies
 
+Run this in your terminal (Windows: cmd/PowerShell, Linux/macOS: terminal):
+
+```bash
+pip install PyQt5 googletrans==4.0.0-rc1
+```
+
+> ⚠️ `googletrans` version `4.0.0-rc1` is the most stable for now.
+
+---
+
+### ✅ How to run the app
+
+1. Save the script as `qt_translator.py`
+2. In terminal or command prompt, run:
+
+```bash
+python qt_translator.py
+```
+
+---
