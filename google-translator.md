@@ -1,6 +1,6 @@
 ## ✅ PyQt5 GUI Version (for macOS, Windows, and Ubuntu)
 - mac script
-Below is the **converted script** using PyQt5, with **step-by-step comments**, preserving all the functionality from the original Tkinter version.
+- Below is the **converted script** using PyQt5, with **step-by-step comments**, preserving all the functionality from the original Tkinter version.
 
 ---
 ### 🧠 Commented Script: `qt_translator.py`
