@@ -1,4 +1,4 @@
-### ✅ tool google translator
+### ✅ tool API google translator
 
 
 ---
