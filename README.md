@@ -1,1 +1,1 @@
-scriptd for test
+scripts for test
